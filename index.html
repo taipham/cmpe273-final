@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>Rebate Value</h1>
+
+        <h2 id="rebate"></h2>
+
+        <label for="value" class="col-lg-2 control-label">Number of Steps </label>
+        <input id="value" type="text">
+
+        <button id="button">Calculate Rebate</button>
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+       // Our future code here..
+       if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+    </script>
+    <script>
+
+        // Previous if/else statement removed for brevity
+
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+        var CoursetroContract = web3.eth.contract([{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getBuyer","outputs":[{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"steps","type":"uint256"}],"name":"calculateRebate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_fName","type":"string"},{"name":"_age","type":"uint256"},{"name":"_value","type":"uint256"}],"name":"setBuyer","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getRebateValue","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"}]);
+        var Coursetro = CoursetroContract.at('0x417371b9b732733171d4bf477e1e2490ee1911d4');
+        console.log(Coursetro);
+    </script>
+
+    <script>
+
+        // Previous code removed for brevity
+
+        Coursetro.getRebateValue(function(error, result){
+            if(!error)
+                {
+                    $("#rebate").html(result + ' ether');
+                    console.log(result);
+                }
+                else
+                    console.error(error);
+            });
+
+        $("#button").click(function() {
+            Coursetro.calculateRebate($("#value").val(), (err, res) => {
+            });
+        });
+
+    </script>
+</body>
+</html>
