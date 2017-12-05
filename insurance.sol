@@ -43,5 +43,4 @@ contract InsuranceContract {
       msg.sender.transfer(amount);
   }
 
-  function getUserInfo() 
 }
