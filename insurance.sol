@@ -42,4 +42,6 @@ contract InsuranceContract {
       pendingWithdrawals[msg.sender] = 0;
       msg.sender.transfer(amount);
   }
+
+  function getUserInfo() 
 }

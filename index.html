@@ -14,16 +14,17 @@
 <body>
     <div class="container">
 
-        <h1>Rebate Value</h1>
+        <h1>Smart Insure</h1>
 
-        <h2 id="rebate"></h2>
-
-        <label for="value" class="col-lg-2 control-label">Number of Steps </label>
+        <label for="value" class="col-lg-2 control-label">Input number of Steps </label>
         <input id="value" type="text">
 
-        <button id="button">Calculate Rebate</button>
+        <button id="button">Calculate Refund</button>
 
+        <label for="value" class="col-lg-2 control-label">Your refund for this month is: </label>
+        <h2 id="rebate"></h2>
 
+        <button id="button-withdraw">Withdraw refund</button>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
@@ -63,9 +64,20 @@
 
         $("#button").click(function() {
             Coursetro.calculateRebate($("#value").val(), (err, res) => {
+                if(!err)
+                {
+                    $("#rebate").html(result + ' ether');
+                    console.log(result);
+                }
+                else
+                    console.error(error);
             });
         });
 
+        $("#button-withdraw").click(function() {
+            Coursetro.withdraw((err, res) => {
+            });
+        });
     </script>
 </body>
 </html>
