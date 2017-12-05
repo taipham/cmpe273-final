@@ -30,6 +30,8 @@
 
         <button id="buttonReg">Register</button>
 
+        <label for="steps" class="col-lg-2 control-label">Enter number of steps</label>
+        <input id="steps" type="text">
         <button id="buttonSend">Send Monthly</button>
 
 
@@ -78,7 +80,7 @@
         });
 
         $("#buttonSend").click(function() {
-            var sendMonthly = Coursetro.sendMonthly.getData(10001);
+            var sendMonthly = Coursetro.sendMonthly.getData($("#steps").val());
             web3.eth.sendTransaction({
                 from: web3.eth.accounts[0],
                 to: "0xd2361347c81f4c7d2046b40e176671fc0a86d584",
