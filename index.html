@@ -14,70 +14,79 @@
 <body>
     <div class="container">
 
-        <h1>Smart Insure</h1>
+        <h1>Your Info</h1>
 
-        <label for="value" class="col-lg-2 control-label">Input number of Steps </label>
-        <input id="value" type="text">
+        <h2 id="info"></h2>
+        
 
-        <button id="button">Calculate Refund</button>
+        <label for="name" class="col-lg-2 control-label">Enter name</label>
+        <input id="name" type="text">
 
-        <label for="value" class="col-lg-2 control-label">Your refund for this month is: </label>
-        <h2 id="rebate"></h2>
+        <label for="age" class="col-lg-2 control-label">Enter age</label>
+        <input id="age" type="text">
 
-        <button id="button-withdraw">Withdraw refund</button>
+        <label for="baseCost" class="col-lg-2 control-label">Enter baseCost</label>
+        <input id="baseCost" type="text">
+
+        <button id="buttonReg">Register</button>
+
+        <button id="buttonSend">Send Monthly</button>
+
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 
     <script>
-       // Our future code here..
-       if (typeof web3 !== 'undefined') {
+        if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
         } else {
             // set the provider you want from Web3.providers
             web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
         }
-    </script>
-    <script>
-
-        // Previous if/else statement removed for brevity
 
         web3.eth.defaultAccount = web3.eth.accounts[0];
-        var CoursetroContract = web3.eth.contract([{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getBuyer","outputs":[{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"steps","type":"uint256"}],"name":"calculateRebate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_fName","type":"string"},{"name":"_age","type":"uint256"},{"name":"_value","type":"uint256"}],"name":"setBuyer","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getRebateValue","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"}]);
-        var Coursetro = CoursetroContract.at('0x417371b9b732733171d4bf477e1e2490ee1911d4');
-        console.log(Coursetro);
-    </script>
+        console.log(web3.eth.defaultAccount);
+        var CoursetroContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"_steps","type":"uint256"}],"name":"sendMonthly","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"string"},{"name":"_age","type":"uint32"},{"name":"_baseCost","type":"uint32"}],"name":"regInsurance","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getMyInfo","outputs":[{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]);
+        var Coursetro = CoursetroContract.at('0xd2361347c81f4c7d2046b40e176671fc0a86d584');
 
-    <script>
 
-        // Previous code removed for brevity
+        // var instructorEvent = Coursetro.instructorInfo({},'latest');
+        // instructorEvent.watch(function (err, result) {
+        //     if (!err) {
+        //         console.log('no');
+        //         $("#insTrans").html('Block hash: ' +result.blockHash);
+        //         $("#instructor").html(web3.toAscii(result.args.fName) + ' ' + web3.toAscii(result.args.lName) + ' (' + result.args.age + ' years old)');
+        //     } else {
+        //         console.log('erro');
+        //     }
+        // });
 
-        Coursetro.getRebateValue(function(error, result){
-            if(!error)
-                {
-                    $("#rebate").html(result + ' ether');
-                    console.log(result);
-                }
-                else
-                    console.error(error);
-            });
+        
+        Coursetro.getMyInfo(web3.eth.defaultAccount, (err, res) => {
+            if (res)
+                $("#info").html('' + res + 'name: ' + res[0] + ',  age: ' + res[1] + '/' + res[2] + '/' + res[3] + '/' + res[4] + '/' + res[5]); 
+            else console.log(err);
+        });
 
-        $("#button").click(function() {
-            Coursetro.calculateRebate($("#value").val(), (err, res) => {
-                if(!err)
-                {
-                    $("#rebate").html(result + ' ether');
-                    console.log(result);
-                }
-                else
-                    console.error(error);
+        
+        $("#buttonReg").click(function() {
+            Coursetro.regInsurance($("#name").val(), $("#age").val(), $("#baseCost").val(), (err, res) => {
+                if(!err) console.log('good' + web3.eth.defaultAccount);
+                else console.log(err);
             });
         });
 
-        $("#button-withdraw").click(function() {
-            Coursetro.withdraw((err, res) => {
-            });
+        $("#buttonSend").click(function() {
+            var sendMonthly = Coursetro.sendMonthly.getData(10001);
+            web3.eth.sendTransaction({
+                from: web3.eth.accounts[0],
+                to: "0xd2361347c81f4c7d2046b40e176671fc0a86d584",
+                data: sendMonthly,
+                value: web3.toWei(1, "ether")}, (err, res) => { console.log('this is: ' + err)});
         });
+
     </script>
+
 </body>
 </html>
