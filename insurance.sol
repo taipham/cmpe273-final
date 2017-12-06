@@ -2,65 +2,87 @@ pragma solidity ^0.4.18;
 
 contract InsuranceContract {
     address insurer;
-
+    
+    uint totalRebateofAll;
     
     struct buyer {
         string name;
-        uint32 age;
-        uint32 baseCost;
-        uint32 totalRebate;
+        uint age;
+        uint baseCost;
+        uint totalRebate;
         uint monthlySendDate;
         string insureProof;
     }
   
+    mapping (address => uint) buyerRebate;
     mapping (address => buyer) buyers;
-    address[] buyerAddresses;
     
-
+    modifier notInsurer() {
+        require(msg.sender != insurer);
+        _;
+    }
+    
+    modifier isInsurer() {
+        require(msg.sender == insurer);
+        _;
+    }
+    
     function InsuranceContract() public {
         insurer = msg.sender;
     }
     
-
-    function regInsurance(string _name, uint32 _age, uint32 _baseCost) public returns (string) {
+    function regInsurance(string _name, uint _age, uint _baseCost) public notInsurer returns (string) {
         var aBuyer = buyers[msg.sender];
         aBuyer.name = _name;
         aBuyer.age = _age;
         aBuyer.baseCost = _baseCost;
         aBuyer.totalRebate = 0;
-        aBuyer.monthlySendDate = now;
         // randomize a string here => hash the string => store the hash here for now.
         aBuyer.insureProof = "random string hash";
-        buyerAddresses.push(msg.sender);
         return aBuyer.insureProof;
     }
   
-    function sendMonthly(uint _steps) public payable{
+    function sendMonthly(uint _steps) public notInsurer payable{
+        buyers[msg.sender].monthlySendDate = now;
         calculateRebate(_steps);
+        
     }
   
-    function getMyInfo() public view returns (string, uint, uint, uint, uint, string) {
+    function getMyInfo() public view notInsurer returns (string, uint, uint, string) {
         var info = buyers[msg.sender];
-        return (info.name, info.age, info.baseCost, info.totalRebate, info.monthlySendDate, info.insureProof);
+        return (info.name, info.age, info.monthlySendDate, info.insureProof);
+    }
+    
+    function getRebate() public view notInsurer returns(uint) {
+        //require(msg.sender != insurer);
+        return buyerRebate[msg.sender];
     }
   
     function calculateRebate(uint steps) private {
-        uint32 rebate = 0;
+        uint rebate = 0;
         if (steps > 10000) {
-            rebate = 1;
+            rebate = 100000000000000000;
         }
         buyers[msg.sender].totalRebate += rebate;
+        buyerRebate[msg.sender] = buyers[msg.sender].totalRebate;
+        totalRebateofAll += rebate;
     }
-
-//   function getRebateValue() public constant returns (uint) {
-//       return pendingWithdrawals[msg.sender];
-//   }
-
-//   function withdraw() {
-//       uint amount = pendingWithdrawals[msg.sender];
-//       // Remember to zero the pending refund before
-//       // sending to prevent re-entrancy attacks
-//       pendingWithdrawals[msg.sender] = 0;
-//       msg.sender.transfer(amount);
-//   }
+    
+    function withdraw() public notInsurer{
+        uint amount = buyers[msg.sender].totalRebate;
+        buyers[msg.sender].totalRebate = 0;
+        buyerRebate[msg.sender] = 0;
+        totalRebateofAll -= amount;
+        msg.sender.transfer(amount);
+    }
+    
+    function insurerWithdraw() public isInsurer returns(uint){
+        uint amt = this.balance - totalRebateofAll;
+        insurer.transfer(amt);
+        return amt;
+    }
+    
+    function getBal() view returns(uint){
+        return this.balance;
+    }
 }
