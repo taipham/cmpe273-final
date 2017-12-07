@@ -28,6 +28,9 @@
         <label for="baseCost" class="col-lg-2 control-label">Enter baseCost</label>
         <input id="baseCost" type="text">
 
+        <label for="step" class="col-lg-2 control-label">Step</label>
+        <input id="step" type="text">
+
         <button id="buttonReg">Register</button>
         <button id="buttonSend">Send Monthly</button>
         <button id="buttonWithdraw">Withdraw</button>
@@ -52,14 +55,14 @@
         web3.eth.defaultAccount = web3.eth.accounts[0];
         console.log(web3.eth.defaultAccount);
         var InsuranceContract = web3.eth.contract([{"constant":true,"inputs":[],"name":"getBal","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_name","type":"string"},{"name":"_age","type":"uint256"},{"name":"_baseCost","type":"uint256"}],"name":"regInsurance","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_steps","type":"uint256"}],"name":"sendMonthly","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"insurerWithdraw","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getMyInfo","outputs":[{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getRebate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]);
-        var Insurance = InsuranceContract.at('0x8c9f625b9a659a41749f957037273772c3cc068a');
+        var Insurance = InsuranceContract.at('0x707be0888f17738202d436206900b1b39d4dbeab');
     
 
         $("#buttonGet").click(function() {
             Insurance.getMyInfo(web3.eth.defaultAccount, (err, res) => {
                 if (res){
                     $("#info").html('name: ' + res[0] + ',  age: ' + res[1]);
-                    $("#info1").html('pay date' + res[2] + 'proof' + res[3]);
+                    $("#info1").html('date:' + res[2] + '    proof:' + res[3]);
                 }
                 else console.log(err);
             });
@@ -79,11 +82,12 @@
         });
 
         $("#buttonSend").click(function() {
-            var sendMonthly = Insurance.sendMonthly.getData(10001);
+            var sendMonthly = Insurance.sendMonthly.getData($("#step").val());
             web3.eth.sendTransaction({
                 from: web3.eth.accounts[0],
-                to: "0x8c9f625b9a659a41749f957037273772c3cc068a",
+                to: "0x707be0888f17738202d436206900b1b39d4dbeab",
                 data: sendMonthly,
+                gas: 410000,
                 value: web3.toWei(1, "ether")}, (err, res) => { console.log('this is: ' + err)});
         });
 
@@ -95,7 +99,7 @@
         });
 
         $("#buttonAmount").click(function() {
-            Insurance.insurerWithdraw({from: '0x7ca1fd8383cf5bb4f0436149a280fa422e860e92',gas: 410000}, (err, res) => {
+            Insurance.insurerWithdraw({from: '0x5b167f053944b873e35a717ad1826c12a83fd511',gas: 410000}, (err, res) => {
                 if (res){
                     $("#info3").html('amount: ' + res);
                 }
